@@ -54,7 +54,9 @@ function Product() {
     deleteData(id, axiosPrivate);
   };
   return loading ? (
-    <h1 className="text-3xl text-black font-bold text-center">Loading ....</h1>
+    <div className="h-screen w-full flex justify-center items-center">
+      <Spinner />
+    </div>
   ) : (
     <div className="mx-4 h-fit">
       <HeaderOutlet>Data Products</HeaderOutlet>
@@ -65,7 +67,7 @@ function Product() {
           </Link>
         </div>
       </div>
-      <Table header={["Nama Produk", "Tipe", "Image", "Harga", "Stock", "Action"]}>
+      <Table header={["Product Name", "Type", "Image", "Price", "Stock", "Action"]}>
         {data.data.map((r, i) => {
           return (
             <tr className="table-row " key={i}>
@@ -100,7 +102,7 @@ function Product() {
         })}
       </Table>
       {data.length < 1 && <h1 className="text-2xl text-black font-bold text-center">There's no data yet</h1>}
-      <Pagination totalData={data.totalData} setPage={setPage} display={data.displayPage} currentPage={data.current} />
+      <Pagination className="my-4" totalData={data.totalData} setPage={setPage} display={data.displayPage} currentPage={data.current} />
     </div>
   );
 }

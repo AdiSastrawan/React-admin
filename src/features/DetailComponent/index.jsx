@@ -22,12 +22,13 @@ function DetailComponent() {
     fetchData(axiosClient, setData, id, setLoading);
   }, []);
   return loading ? (
-    <Spinner />
+    <div className="min-h-[400px] w-full flex justify-center items-center ">
+      <Spinner />
+    </div>
   ) : (
-    <div className="w-full h-full flex   rounded-md ">
+    <div className="w-full h-full flex   rounded-md  ">
       <div className="w-1/3 h-full  flex items-center flex-col  ">
         <img className="w-60 object-contain my-4" src={import.meta.env.VITE_BASE_URL + "/" + data.image} alt="" />
-        <p className="text-center">{data.desc}</p>
       </div>
 
       <div className="w-2/3 h-full mx-2">
@@ -54,6 +55,15 @@ function DetailComponent() {
                       </div>
                     );
                   })}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td className="flex items-center w-full">Description </td>
+              <td className="  ">
+                <div className="flex">
+                  <div>:</div>
+                  <div> {data.desc}</div>
                 </div>
               </td>
             </tr>

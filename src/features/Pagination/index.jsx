@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "../../components/Button";
 
-function Pagination({ display = 10, totalData, currentPage, setPage }) {
+function Pagination({ display = 10, totalData, currentPage, setPage, className = "" }) {
   const pageHandler = (i) => {
     setPage((prev) => {
       return i;
@@ -25,10 +25,32 @@ function Pagination({ display = 10, totalData, currentPage, setPage }) {
     return element;
   };
   return (
-    <div className="flex gap-1 justify-end">
+    <div className={"flex gap-1 justify-end " + className}>
+      <Button
+        disabled={currentPage < 2}
+        onClick={() => {
+          setPage((prev) => {
+            return prev - 1;
+          });
+        }}
+        className="bg-primary"
+      >
+        {"<"}
+      </Button>
       {paginateElement().map((e, i) => {
         return e;
       })}
+      <Button
+        disabled={currentPage > Math.abs(totalData / display)}
+        onClick={() => {
+          setPage((prev) => {
+            return prev + 1;
+          });
+        }}
+        className="bg-primary"
+      >
+        {">"}
+      </Button>
     </div>
   );
 }

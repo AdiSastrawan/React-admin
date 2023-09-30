@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import HeaderOutlet from "../../../features/Header";
 import Input from "../../../components/Input";
 import Label from "../../../components/Label";
@@ -38,10 +38,13 @@ const sendData = async (formData, setLoading, navigate, axiosClient) => {
     setLoading(false);
   }
 };
+
 function AddProduct() {
   const axiosClient = useAxiosPrivate();
   const [type, setType] = useState([]);
   const [size, setSize] = useState([]);
+  const [previewImage, setPreviewImage] = useState("");
+  const [isDrag, setIsDrag] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [payload, setPayload] = useState({ name: "", image: {}, type: "", price: 0, stock: [{ size_id: null, quantity: 0 }], desc: "" });
@@ -54,9 +57,6 @@ function AddProduct() {
       return tmp;
     });
   };
-  const test = () => {
-    console.log(payload);
-  };
   useEffect(() => {
     if (payload.length == 0) {
       setPayload((prev) => {
@@ -66,10 +66,23 @@ function AddProduct() {
       });
     }
     getType(setType, axiosClient);
+    getSize(setSize, axiosClient);
   }, []);
+  const dropHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDrag(false);
+    setPayload((prev) => {
+      let tmp = { ...prev };
+      tmp.image = e.dataTransfer.files[0];
+      return tmp;
+    });
+    setPreviewImage(URL.createObjectURL(e.dataTransfer.files[0]));
+  };
+  const imageRef = useRef();
   const addHandler = () => {
     let tmp = [...payload.stock];
-    tmp.push({ size_id: null, quantity: tmp.length });
+    tmp.push({ size_id: null, quantity: 0 });
     setPayload((prev) => {
       let temp = { ...prev };
       temp.stock = [...tmp];
@@ -99,9 +112,20 @@ function AddProduct() {
   };
 
   return (
-    <div className="mx-4 my-2 p-3 rounded-md bg-secondary">
-      <Button className="bg-gray-500 text-black px-3 ">
-        <Link to={from}>{"<"}</Link>
+    <div
+      className="mx-4 my-2 p-3 rounded-md bg-secondary"
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDrag(true);
+      }}
+    >
+      <Button
+        onClick={() => {
+          navigate(from);
+        }}
+        className="bg-gray-500 text-black px-3 "
+      >
+        {"<"}
       </Button>
       <HeaderOutlet>Add Product</HeaderOutlet>
       <form onSubmit={submitHandler} className="grid grid-cols-2 gap-2" action="">
@@ -148,17 +172,51 @@ function AddProduct() {
             id=""
             cols="20"
             rows="5"
+            className="outline-accent p-1"
           ></textarea>
           <Label>Image</Label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            onChange={(e) => {
-              changeHandler(e, "image");
+          <div
+            className={`${isDrag ? "bg-accent" : "bg-background"} relative flex group justify-center py-2 cursor-pointer transition-colors hover:bg-secondary rounded-md`}
+            onClick={() => {
+              imageRef.current.click();
             }}
-            accept={"image/jpeg,image/png,image/gif"}
-          />
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDrag(true);
+            }}
+            onDrop={dropHandler}
+          >
+            {previewImage ? (
+              <>
+                <div className={`bg-primary flex items-center text-center justify-center ${isDrag ? "opacity-80 text-xl z-[9999]" : "opacity-0 text-base z-[-400]"} transition-all  w-full h-full absolute  text-white `}>Drop here</div>
+                <img
+                  className={` ${isDrag && "scale-95 opacity-70"} h-40 group-hover:scale-105 group-hover:shadow-xl transition-all object-contain`}
+                  src={previewImage == "" ? import.meta.env.VITE_BASE_URL + "/" + payload?.image : previewImage}
+                  alt={payload?.name}
+                />
+              </>
+            ) : (
+              <div className={`flex justify-center ${isDrag && "text-xl font-medium"} group-hover:text-xl transition-all group-hover:font-medium items-center h-40`}>
+                <h2>{isDrag ? "Drop the image here" : "Click here to add image or Drop the image"}</h2>
+              </div>
+            )}
+
+            <input
+              hidden
+              ref={imageRef}
+              type="file"
+              id="image"
+              name="image"
+              onChange={(e) => {
+                setPreviewImage((prev) => {
+                  changeHandler(e, "image");
+                  console.log(URL.createObjectURL(e.target.files[0]));
+                  return URL.createObjectURL(e.target.files[0]);
+                });
+              }}
+              accept={"image/jpeg,image/png,image/gif"}
+            />
+          </div>
         </div>
         <div className="flex flex-col space-y-2">
           <Label>Price</Label>
@@ -189,7 +247,6 @@ function AddProduct() {
           </Button>
         </div>
       </form>
-      <Button onClick={test}>Test</Button>
     </div>
   );
 }
