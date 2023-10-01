@@ -206,9 +206,8 @@ function EditProduct() {
                 id="image"
                 name="image"
                 onChange={(e) => {
-                  setPreviewImage((prev) => {
+                  setPreviewImage(() => {
                     changeHandler(e, "image");
-                    console.log(URL.createObjectURL(e.target.files[0]));
                     return URL.createObjectURL(e.target.files[0]);
                   });
                 }}
@@ -234,7 +233,6 @@ function EditProduct() {
               </div>
               {payload.stock.map((row, i) => {
                 return <StockElement update={true} key={i} ind={i} size={size} deleteHandler={deleteHandler} payload={payload} setPayload={setPayload} />;
-                //   return row;
               })}
             </div>
             <Button disabled={loading} className="bg-accent" type="submit">

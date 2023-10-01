@@ -7,16 +7,26 @@ import Td from "../../components/Table/Tabledata";
 import HeaderOutlet from "../../features/Header";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Pagination from "../../features/Pagination";
+import Select from "../../components/Select";
 
-const fetchData = async (setData, axiosPrivate, setLoading, page = 1) => {
+const fetchData = async (setData, axiosPrivate, setLoading, page = 1, search, type) => {
   try {
-    const response = await axiosPrivate.get(`/products?page=${page}`);
+    const response = await axiosPrivate.get(`/products?page=${page}${search ? "&search=" + search : ""}${type ? "&type=" + type : ""}`);
     console.log(response.data);
     setData(response.data);
   } catch (error) {
     console.log(error);
   } finally {
     setLoading(false);
+  }
+};
+const fetchTypes = async (setTypes, axiosPrivate) => {
+  try {
+    const response = await axiosPrivate.get(`/types`);
+    console.log(response.data);
+    setTypes(response.data.data);
+  } catch (error) {
+    console.log(error);
   }
 };
 const deleteData = async (id, axiosPrivate) => {
@@ -39,14 +49,28 @@ function sumArray(data) {
 
 function Product() {
   const [data, setData] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [type, setType] = useState("");
   const axiosPrivate = useAxiosPrivate();
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const [trigger, setTrigger] = useState(false);
   const [page, setPage] = useState(1);
   const location = useLocation();
   useEffect(() => {
-    fetchData(setData, axiosPrivate, setLoading, page);
-  }, [trigger, page]);
+    fetchData(setData, axiosPrivate, setLoading, page, search, type);
+  }, [trigger, page, type]);
+  useEffect(() => {
+    const sentSearch = setTimeout(() => {
+      fetchData(setData, axiosPrivate, setLoading, page, search, type);
+    }, 500);
+    return () => {
+      clearTimeout(sentSearch);
+    };
+  }, [search]);
+  useEffect(() => {
+    fetchTypes(setTypes, axiosPrivate);
+  }, []);
   const deleteProduct = (id) => {
     setTrigger((prev) => {
       return !prev;
@@ -60,7 +84,37 @@ function Product() {
   ) : (
     <div className="mx-4 h-fit">
       <HeaderOutlet>Data Products</HeaderOutlet>
-      <div className="w-full flex flex-row-reverse py-2">
+
+      <div className="w-full flex items-center justify-between py-2 px-2">
+        <div className="space-x-2">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+            placeholder="Search product"
+            className="focus:outline-accent border-2 rounded-md w-64  border-secondary px-2 py-1"
+          />
+          <Select
+            value={type}
+            onChange={(e) => {
+              setType(e.target.value);
+            }}
+            className="py-1 capitalize px-2 border-secondary border-2 min-w-fit"
+          >
+            <option value={""} selected>
+              All
+            </option>
+            {types.map((type, i) => {
+              return (
+                <option className="capitalize" key={i} value={type._id}>
+                  {type.name}
+                </option>
+              );
+            })}
+          </Select>
+        </div>
         <div>
           <Link to="add-product" state={{ from: location }}>
             <Button className="bg-green-600">Add Product</Button>

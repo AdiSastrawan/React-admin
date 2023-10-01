@@ -1,7 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import useAxiosPrivate from "../../../hooks/axiosPrivate";
-import Spinner from "../../../components/Spinner";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import HeaderOutlet from "../../../features/Header";
 import DetailComponent from "../../../features/DetailComponent";
 import Button from "../../../components/Button";

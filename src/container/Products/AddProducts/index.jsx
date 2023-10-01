@@ -210,7 +210,6 @@ function AddProduct() {
               onChange={(e) => {
                 setPreviewImage((prev) => {
                   changeHandler(e, "image");
-                  console.log(URL.createObjectURL(e.target.files[0]));
                   return URL.createObjectURL(e.target.files[0]);
                 });
               }}
