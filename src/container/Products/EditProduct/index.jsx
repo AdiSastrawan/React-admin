@@ -8,6 +8,7 @@ import useAxiosPrivate from "../../../hooks/axiosPrivate";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/Spinner";
 import Select from "../../../components/Select";
+import Dropinput from "../../../components/Dropinput";
 
 const getType = async (setType, axiosClient) => {
   try {
@@ -63,7 +64,6 @@ function EditProduct() {
   const [type, setType] = useState([]);
   const [size, setSize] = useState([]);
   const [isDrag, setIsDrag] = useState(false);
-  const [previewImage, setPreviewImage] = useState("");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isFetch, setIsFetch] = useState(true);
@@ -77,7 +77,7 @@ function EditProduct() {
       return tmp;
     });
   };
-  const imageRef = useRef();
+
   useEffect(() => {
     getProduct(setPayload, id, axiosClient, setIsFetch);
     getType(setType, axiosClient);
@@ -104,17 +104,7 @@ function EditProduct() {
     setLoading(true);
     sendData(formData, setLoading, navigate, id, axiosClient);
   };
-  const dropHandler = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setPayload((prev) => {
-      let tmp = { ...prev };
-      tmp.image = e.dataTransfer.files[0];
-      return tmp;
-    });
-    setIsDrag(false);
-    setPreviewImage(URL.createObjectURL(e.dataTransfer.files[0]));
-  };
+
   return (
     <div
       className="mx-4 my-2 p-3 rounded-md bg-secondary"
@@ -186,34 +176,7 @@ function EditProduct() {
               value={payload?.desc}
             ></textarea>
             <Label>Image</Label>
-            <div
-              className={`bg-background relative flex group justify-center py-2 cursor-pointer transition-colors hover:bg-secondary rounded-md`}
-              onClick={() => {
-                imageRef.current.click();
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDrag(true);
-              }}
-              onDrop={dropHandler}
-            >
-              <div className={`bg-primary flex items-center text-center justify-center ${isDrag ? "opacity-80 text-xl z-[9999]" : "opacity-0 text-base z-[-400]"} transition-all  w-full h-full absolute  text-white `}>Drop here</div>
-              <img className="h-60 group-hover:scale-105 group-hover:shadow-xl transition-all object-contain" src={previewImage == "" ? import.meta.env.VITE_BASE_URL + "/" + payload?.image : previewImage} alt={payload?.name} />
-              <input
-                hidden
-                ref={imageRef}
-                type="file"
-                id="image"
-                name="image"
-                onChange={(e) => {
-                  setPreviewImage(() => {
-                    changeHandler(e, "image");
-                    return URL.createObjectURL(e.target.files[0]);
-                  });
-                }}
-                accept={"image/jpeg,image/png,image/gif"}
-              />
-            </div>
+            <Dropinput payload={payload} setIsDrag={setIsDrag} setPayload={setPayload} isDrag={isDrag} />
           </div>
           <div className="flex flex-col space-y-2">
             <Label>Price</Label>

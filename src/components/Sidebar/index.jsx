@@ -9,6 +9,7 @@ function Sidebar() {
         <NavLists className="text-xl font-medium">
           <Navlist to="/">Dashboard</Navlist>
           <Navlist to="products">Product</Navlist>
+          <Navlist to="types">Types</Navlist>
         </NavLists>
       </nav>
     </div>

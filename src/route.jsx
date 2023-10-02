@@ -9,6 +9,8 @@ import PersistLogin from "./container/PersistLogin";
 import AddProduct from "./container/Products/AddProducts";
 import EditProduct from "./container/Products/EditProduct";
 import DetailProduct from "./container/Products/DetailProduct";
+import Types from "./container/Types";
+import AddTypes from "./container/Types/AddTypes";
 
 const userRoute = createBrowserRouter([
   {
@@ -26,6 +28,8 @@ const userRoute = createBrowserRouter([
               { path: "products/add-product", element: <AddProduct /> },
               { path: "products/edit-product/:id", element: <EditProduct /> },
               { path: "products/:id", element: <DetailProduct /> },
+              { path: "types", element: <Types /> },
+              { path: "types/add-types", element: <AddTypes /> },
             ],
           },
         ],

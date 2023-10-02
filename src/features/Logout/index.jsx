@@ -26,7 +26,7 @@ function Logout({ className = "" }) {
     logoutHandler(navigate, setLoading, setAuth);
   };
   return (
-    <Button className={"px-2 py-2 " + className} onClick={onClickHandler}>
+    <Button className={" " + className} onClick={onClickHandler}>
       {loading ? <Spinner /> : "Logout"}
     </Button>
   );

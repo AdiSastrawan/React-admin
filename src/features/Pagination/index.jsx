@@ -1,10 +1,9 @@
-import React from "react";
 import Button from "../../components/Button";
 
 function Pagination({ display = 10, totalData, currentPage, setPage, className = "" }) {
   const pageHandler = (i) => {
     console.log(i);
-    setPage((prev) => {
+    setPage(() => {
       return i;
     });
   };
