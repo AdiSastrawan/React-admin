@@ -47,6 +47,9 @@ function Types() {
                 <div className="max-w-48 flex justify-center">
                   <img className="rounded-md h-40 object-cover" src={type.image ? import.meta.env.VITE_BASE_URL + "/" + type.image : image1} alt={type.name} />
                 </div>
+                <Link to={`edit-types/${type._id}`}>
+                  <Button>Edit</Button>
+                </Link>
               </Card>
             );
           })}

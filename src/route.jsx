@@ -11,6 +11,7 @@ import EditProduct from "./container/Products/EditProduct";
 import DetailProduct from "./container/Products/DetailProduct";
 import Types from "./container/Types";
 import AddTypes from "./container/Types/AddTypes";
+import EditTypes from "./container/Types/EditTypes";
 
 const userRoute = createBrowserRouter([
   {
@@ -30,6 +31,7 @@ const userRoute = createBrowserRouter([
               { path: "products/:id", element: <DetailProduct /> },
               { path: "types", element: <Types /> },
               { path: "types/add-types", element: <AddTypes /> },
+              { path: "types/edit-types/:id", element: <EditTypes /> },
             ],
           },
         ],
