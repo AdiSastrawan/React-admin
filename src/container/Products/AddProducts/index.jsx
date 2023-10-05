@@ -21,7 +21,7 @@ const getType = async (setType, axiosClient) => {
 const getSize = async (setSize, axiosClient) => {
   try {
     const response = await axiosClient.get("/size");
-    setSize(response.data.data);
+    setSize(response.data);
   } catch (error) {
     console.log(error);
   }

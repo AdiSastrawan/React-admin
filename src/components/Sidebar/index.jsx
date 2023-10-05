@@ -10,6 +10,7 @@ function Sidebar() {
           <Navlist to="/">Dashboard</Navlist>
           <Navlist to="products">Product</Navlist>
           <Navlist to="types">Types</Navlist>
+          <Navlist to="sizes">Sizes</Navlist>
         </NavLists>
       </nav>
     </div>

@@ -1,17 +1,19 @@
-import React, { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../components/Table";
 import Button from "../../components/Button";
 import useAxiosPrivate from "../../hooks/axiosPrivate";
 import Spinner from "../../components/Spinner";
 import Td from "../../components/Table/Tabledata";
 import HeaderOutlet from "../../features/Header";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Pagination from "../../features/Pagination";
 import Select from "../../components/Select";
 
-const fetchData = async (setData, axiosPrivate, setLoading, page = 1, search, type) => {
+const fetchData = async (setData, axiosPrivate, setLoading, page = 1, search, type, controller) => {
   try {
-    const response = await axiosPrivate.get(`/products?page=${page}${search ? "&search=" + search : ""}${type ? "&type=" + type : ""}`);
+    const response = await axiosPrivate.get(`/products?page=${page}${search ? "&search=" + search : ""}${type ? "&type=" + type : ""}`, {
+      signal: controller.signal,
+    });
     console.log(response.data);
     setData(response.data);
   } catch (error) {
@@ -31,7 +33,7 @@ const fetchTypes = async (setTypes, axiosPrivate) => {
 };
 const deleteData = async (id, axiosPrivate) => {
   try {
-    const response = await axiosPrivate.delete(`/products/${id}`);
+    await axiosPrivate.delete(`/products/${id}`);
   } catch (error) {
     console.log(error);
   }
@@ -58,14 +60,20 @@ function Product() {
   const [page, setPage] = useState(1);
   const location = useLocation();
   useEffect(() => {
-    fetchData(setData, axiosPrivate, setLoading, page, search, type);
+    const controller = new AbortController();
+    fetchData(setData, axiosPrivate, setLoading, page, search, type, controller);
+    return () => {
+      controller.abort();
+    };
   }, [trigger, page, type]);
   useEffect(() => {
+    const controller = new AbortController();
     const sentSearch = setTimeout(() => {
-      fetchData(setData, axiosPrivate, setLoading, page, search, type);
+      fetchData(setData, axiosPrivate, setLoading, page, search, type, controller);
     }, 500);
     return () => {
       clearTimeout(sentSearch);
+      controller.abort();
     };
   }, [search]);
   useEffect(() => {
@@ -91,6 +99,7 @@ function Product() {
             type="text"
             value={search}
             onChange={(e) => {
+              setPage(1);
               setSearch(e.target.value);
             }}
             placeholder="Search product"
@@ -99,6 +108,7 @@ function Product() {
           <Select
             value={type}
             onChange={(e) => {
+              setPage(1);
               setType(e.target.value);
             }}
             className="py-1 capitalize px-2 border-secondary border-2 min-w-fit"
@@ -122,7 +132,7 @@ function Product() {
         </div>
       </div>
       <Table header={["Product Name", "Type", "Image", "Price", "Stock", "Action"]}>
-        {data.data.map((r, i) => {
+        {data?.data?.map((r, i) => {
           return (
             <tr className="table-row " key={i}>
               <Td>{r.name}</Td>
@@ -155,7 +165,7 @@ function Product() {
           );
         })}
       </Table>
-      {data.length < 1 && <h1 className="text-2xl text-black font-bold text-center">There's no data yet</h1>}
+      {data.data?.length < 1 && <h1 className="text-2xl text-black font-bold text-center">{"There's no data yet"}</h1>}
       <Pagination className="my-4" totalData={data.totalData} setPage={setPage} display={data.displayPage} currentPage={data.current} />
     </div>
   );

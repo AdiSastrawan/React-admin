@@ -1,11 +1,11 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderOutlet from "../../../features/Header";
 import Input from "../../../components/Input";
 import Label from "../../../components/Label";
 import Button from "../../../components/Button";
 import StockElement from "../../../features/StockElement";
 import useAxiosPrivate from "../../../hooks/axiosPrivate";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/Spinner";
 import Select from "../../../components/Select";
 import Dropinput from "../../../components/Dropinput";
@@ -53,7 +53,7 @@ const sendData = async (formData, setLoading, navigate, id, axiosClient) => {
 const getSize = async (setSize, axiosClient) => {
   try {
     const response = await axiosClient.get("/size");
-    setSize(response.data.data);
+    setSize(response.data);
   } catch (error) {
     console.log(error);
   }
