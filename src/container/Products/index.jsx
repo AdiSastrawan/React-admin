@@ -1,95 +1,90 @@
-import { useEffect, useState } from "react";
-import Table from "../../components/Table";
-import Button from "../../components/Button";
-import useAxiosPrivate from "../../hooks/axiosPrivate";
-import Spinner from "../../components/Spinner";
-import Td from "../../components/Table/Tabledata";
-import HeaderOutlet from "../../features/Header";
-import { Link, useLocation } from "react-router-dom";
-import Pagination from "../../features/Pagination";
-import Select from "../../components/Select";
+import { useEffect, useState } from "react"
+import Table from "../../components/Table"
+import Button from "../../components/Button"
+import useAxiosPrivate from "../../hooks/axiosPrivate"
+import { Spinner } from "@chakra-ui/react"
+import Td from "../../components/Table/Tabledata"
+import HeaderOutlet from "../../features/Header"
+import { Link, useLocation } from "react-router-dom"
+import Pagination from "../../features/Pagination"
+import Select from "../../components/Select"
 
 const fetchData = async (setData, axiosPrivate, setLoading, page = 1, search, type, controller) => {
   try {
     const response = await axiosPrivate.get(`/products?page=${page}${search ? "&search=" + search : ""}${type ? "&type=" + type : ""}`, {
       signal: controller.signal,
-    });
-    console.log(response.data);
-    setData(response.data);
+    })
+    setData(response.data)
   } catch (error) {
-    console.log(error);
+    console.log(error)
   } finally {
-    setLoading(false);
+    setLoading(false)
   }
-};
+}
 const fetchTypes = async (setTypes, axiosPrivate) => {
   try {
-    const response = await axiosPrivate.get(`/types`);
-    console.log(response.data);
-    setTypes(response.data.data);
+    const response = await axiosPrivate.get(`/types`)
+    console.log(response.data)
+    setTypes(response.data.data)
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 const deleteData = async (id, axiosPrivate) => {
   try {
-    await axiosPrivate.delete(`/products/${id}`);
+    await axiosPrivate.delete(`/products/${id}`)
   } catch (error) {
-    console.log(error);
+    console.log(error)
   }
-};
+}
 function sumArray(data) {
-  let sum = 0;
+  let sum = 0
   if (data.length < 1) {
-    return 0;
+    return 0
   }
   for (let i = 0; i < data.length; i++) {
-    sum += data[i].quantity;
+    sum += data[i].quantity
   }
-  return sum;
+  return sum
 }
 
 function Product() {
-  const [data, setData] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [type, setType] = useState("");
-  const axiosPrivate = useAxiosPrivate();
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [trigger, setTrigger] = useState(false);
-  const [page, setPage] = useState(1);
-  const location = useLocation();
+  const [data, setData] = useState([])
+  const [types, setTypes] = useState([])
+  const [type, setType] = useState("")
+  const axiosPrivate = useAxiosPrivate()
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+  const [trigger, setTrigger] = useState(false)
+  const [page, setPage] = useState(1)
+  const location = useLocation()
   useEffect(() => {
-    const controller = new AbortController();
-    fetchData(setData, axiosPrivate, setLoading, page, search, type, controller);
+    const controller = new AbortController()
+    fetchData(setData, axiosPrivate, setLoading, page, search, type, controller)
     return () => {
-      controller.abort();
-    };
-  }, [trigger, page, type]);
+      controller.abort()
+    }
+  }, [trigger, page, type])
   useEffect(() => {
-    const controller = new AbortController();
+    const controller = new AbortController()
     const sentSearch = setTimeout(() => {
-      fetchData(setData, axiosPrivate, setLoading, page, search, type, controller);
-    }, 500);
+      fetchData(setData, axiosPrivate, setLoading, page, search, type, controller)
+    }, 500)
     return () => {
-      clearTimeout(sentSearch);
-      controller.abort();
-    };
-  }, [search]);
+      clearTimeout(sentSearch)
+      controller.abort()
+    }
+  }, [search])
   useEffect(() => {
-    fetchTypes(setTypes, axiosPrivate);
-  }, []);
+    fetchTypes(setTypes, axiosPrivate)
+  }, [])
   const deleteProduct = (id) => {
     setTrigger((prev) => {
-      return !prev;
-    });
-    deleteData(id, axiosPrivate);
-  };
-  return loading ? (
-    <div className="h-screen w-full flex justify-center items-center">
-      <Spinner />
-    </div>
-  ) : (
+      return !prev
+    })
+    deleteData(id, axiosPrivate)
+  }
+  return (
     <div className="mx-4 h-fit">
       <HeaderOutlet>Data Products</HeaderOutlet>
 
@@ -99,8 +94,8 @@ function Product() {
             type="text"
             value={search}
             onChange={(e) => {
-              setPage(1);
-              setSearch(e.target.value);
+              setPage(1)
+              setSearch(e.target.value)
             }}
             placeholder="Search product"
             className="focus:outline-accent border-2 rounded-md w-64  border-secondary px-2 py-1"
@@ -108,8 +103,8 @@ function Product() {
           <Select
             value={type}
             onChange={(e) => {
-              setPage(1);
-              setType(e.target.value);
+              setPage(1)
+              setType(e.target.value)
             }}
             className="py-1 capitalize px-2 border-secondary border-2 min-w-fit"
           >
@@ -121,7 +116,7 @@ function Product() {
                 <option className="capitalize" key={i} value={type._id}>
                   {type.name}
                 </option>
-              );
+              )
             })}
           </Select>
         </div>
@@ -132,43 +127,49 @@ function Product() {
         </div>
       </div>
       <Table header={["Product Name", "Type", "Image", "Price", "Stock", "Action"]}>
-        {data?.data?.map((r, i) => {
-          return (
-            <tr className="table-row " key={i}>
-              <Td>{r.name}</Td>
-              <Td>{r.type?.name}</Td>
-              <Td>
-                <img className="h-20 w-20 object-contain " src={import.meta.env.VITE_BASE_URL + `/` + r.image} alt={r.name} />
-              </Td>
-              <Td>{r.price}</Td>
-              <Td>{sumArray(r.stock)}</Td>
-              <Td>
-                {
-                  <div className="space-x-2 text-base">
-                    <Button className="text-base ">
-                      <Link to={`${r._id}`} state={{ from: location }}>
-                        Detail
-                      </Link>
-                    </Button>
-                    <Button className="bg-red-700 text-base" onClick={deleteProduct.bind(this, r._id)}>
-                      Delete
-                    </Button>{" "}
-                    <Button className="text-base bg-yellow-700">
-                      <Link to={`edit-product/${r._id}`} state={{ from: location }}>
-                        Edit
-                      </Link>
-                    </Button>
-                  </div>
-                }
-              </Td>
-            </tr>
-          );
-        })}
+        {loading ? (
+          <div className=" mx-4 h-screen w-full flex justify-center items-center">
+            <Spinner />
+          </div>
+        ) : (
+          data?.data?.map((r, i) => {
+            return (
+              <tr className="table-row " key={i}>
+                <Td>{r.name}</Td>
+                <Td>{r.type?.name}</Td>
+                <Td>
+                  <img className="h-20 w-20 object-contain " src={import.meta.env.VITE_BASE_URL + `/` + r.image} alt={r.name} />
+                </Td>
+                <Td>{r.price}</Td>
+                <Td>{sumArray(r.stock)}</Td>
+                <Td>
+                  {
+                    <div className="space-x-2 text-base">
+                      <Button className="text-base ">
+                        <Link to={`${r._id}`} state={{ from: location }}>
+                          Detail
+                        </Link>
+                      </Button>
+                      <Button className="bg-red-700 text-base" onClick={deleteProduct.bind(this, r._id)}>
+                        Delete
+                      </Button>{" "}
+                      <Button className="text-base bg-yellow-700">
+                        <Link to={`edit-product/${r._id}`} state={{ from: location }}>
+                          Edit
+                        </Link>
+                      </Button>
+                    </div>
+                  }
+                </Td>
+              </tr>
+            )
+          })
+        )}
       </Table>
       {data.data?.length < 1 && <h1 className="text-2xl text-black font-bold text-center">{"There's no data yet"}</h1>}
       <Pagination className="my-4" totalData={data.totalData} setPage={setPage} display={data.displayPage} currentPage={data.current} />
     </div>
-  );
+  )
 }
 
-export default Product;
+export default Product

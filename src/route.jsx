@@ -1,20 +1,23 @@
-import { Outlet, createBrowserRouter } from "react-router-dom";
-import Product from "./container/Products";
-import Login from "./container/Login";
-import Dashboard from "./container/Dashboard";
-import DefaultLayout from "./container/DefaultLayout";
-import RequireAuth from "./container/RequireAuth";
-import Unauthorized from "./container/Unauthorized";
-import PersistLogin from "./container/PersistLogin";
-import AddProduct from "./container/Products/AddProducts";
-import EditProduct from "./container/Products/EditProduct";
-import DetailProduct from "./container/Products/DetailProduct";
-import Types from "./container/Types";
-import AddTypes from "./container/Types/AddTypes";
-import EditTypes from "./container/Types/EditTypes";
-import Sizes from "./container/Sizes";
-import AddSize from "./container/Sizes/AddSize";
-import EditSize from "./container/Sizes/EditSize";
+import { Outlet, createBrowserRouter } from "react-router-dom"
+import Product from "./container/Products"
+import Login from "./container/Login"
+import Dashboard from "./container/Dashboard"
+import DefaultLayout from "./container/DefaultLayout"
+import RequireAuth from "./container/RequireAuth"
+import Unauthorized from "./container/Unauthorized"
+import PersistLogin from "./container/PersistLogin"
+import AddProduct from "./container/Products/AddProducts"
+import EditProduct from "./container/Products/EditProduct"
+import DetailProduct from "./container/Products/DetailProduct"
+import Types from "./container/Types"
+import AddTypes from "./container/Types/AddTypes"
+import EditTypes from "./container/Types/EditTypes"
+import Sizes from "./container/Sizes"
+import AddSize from "./container/Sizes/AddSize"
+import EditSize from "./container/Sizes/EditSize"
+import ListAdmin from "./container/ListAdmin"
+import AddAdmin from "./container/ListAdmin/AddAdmin"
+import EditAdmin from "./container/ListAdmin/EditAdmin"
 
 const userRoute = createBrowserRouter([
   {
@@ -38,6 +41,14 @@ const userRoute = createBrowserRouter([
               { path: "sizes", element: <Sizes /> },
               { path: "sizes/add-size", element: <AddSize /> },
               { path: "sizes/edit-size/:id", element: <EditSize /> },
+              {
+                element: <RequireAuth allowedRoles={["superuser"]} />,
+                children: [
+                  { path: "list-admin", element: <ListAdmin /> },
+                  { path: "list-admin/add-admin", element: <AddAdmin /> },
+                  { path: "list-admin/edit-admin/:id", element: <EditAdmin /> },
+                ],
+              },
             ],
           },
         ],
@@ -46,6 +57,6 @@ const userRoute = createBrowserRouter([
   },
   { path: "/login", element: <Login /> },
   { path: "/unauthorized", element: <Unauthorized /> },
-]);
+])
 
-export default userRoute;
+export default userRoute
