@@ -46,9 +46,7 @@ function Login() {
     <div className="bg-background min-h-screen flex justify-center font-roboto text-white  ">
       <section className="w-1/2 bg-primary my-2 rounded-md">
         <h1 className="text-center py-10 text-2xl font-bold">Login</h1>
-        <Link to="/unauthorized" state={{ from: location }}>
-          Click me
-        </Link>
+
         <form onSubmit={submitHandler} className="flex-col justify-center text-xl flex mx-10 space-y-2 " action="">
           <label htmlFor="username">Username or Email</label>
           <Input placeholder="username or email" type="text" onChange={(e) => setUsername(e.target.value)} value={username} py="5" />

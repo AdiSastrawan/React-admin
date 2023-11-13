@@ -1,6 +1,6 @@
-import React from "react";
+import React from "react"
 
-function Input({ type = "text", value = "", onChange = undefined, name, accept, placeholder, required, className = "", px = "2", py = "2" }) {
+function Input({ type = "text", value = "", ref, onChange = undefined, name, accept, placeholder, required, className = "", px = "2", py = "2" }) {
   return (
     <input
       type={type}
@@ -9,11 +9,12 @@ function Input({ type = "text", value = "", onChange = undefined, name, accept, 
       onChange={onChange}
       accept={accept}
       name={name}
+      ref={ref}
       placeholder={placeholder}
       required={required}
       className={className + ` px-${px} rounded-md py-${py} outline-none text-black  focus-visible:outline-accent `}
     />
-  );
+  )
 }
 
-export default Input;
+export default Input
