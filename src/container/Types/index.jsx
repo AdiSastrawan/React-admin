@@ -1,36 +1,40 @@
-import React, { useEffect, useState } from "react";
-import HeaderOutlet from "../../features/Header";
-import image1 from "../../assets/1.jpg";
-import Card from "../../components/Card";
-import useAxiosPrivate from "../../hooks/axiosPrivate";
-import { Link } from "react-router-dom";
-import Button from "../../components/Button";
-import Spinner from "../../components/Spinner";
+import React, { useEffect, useState } from "react"
+import HeaderOutlet from "../../features/Header"
+import image1 from "../../assets/1.jpg"
+import Card from "../../components/Card"
+import useAxiosPrivate from "../../hooks/axiosPrivate"
+import { Link } from "react-router-dom"
+import Button from "../../components/Button"
+import Spinner from "../../components/Spinner"
+import { AddIcon, EditIcon } from "@chakra-ui/icons"
 const getTypes = async (axiosClient, setLoading, setTypes) => {
   try {
-    const response = await axiosClient.get("/types");
-    setTypes(response.data.data);
-    console.log(response.data.data);
+    const response = await axiosClient.get("/types")
+    setTypes(response.data.data)
+    console.log(response.data.data)
   } catch (error) {
-    console.log(error);
+    console.log(error)
   } finally {
-    setLoading(false);
+    setLoading(false)
   }
-};
+}
 function Types() {
-  const [loading, setLoading] = useState(true);
-  const [types, setTypes] = useState([]);
-  const axiosClient = useAxiosPrivate();
+  const [loading, setLoading] = useState(true)
+  const [types, setTypes] = useState([])
+  const axiosClient = useAxiosPrivate()
   useEffect(() => {
-    getTypes(axiosClient, setLoading, setTypes);
-  }, []);
+    getTypes(axiosClient, setLoading, setTypes)
+  }, [])
   return (
     <div className="mx-4 my-1">
       <div>
         <HeaderOutlet>Data Types</HeaderOutlet>
         <div className="flex justify-end px-3 pb-3">
           <Link to="add-types">
-            <Button className="bg-green-600">Add Types</Button>
+            <Button className="bg-green-600 flex items-center space-x-2">
+              <AddIcon color="white" />
+              <h2>Add Types</h2>
+            </Button>
           </Link>
         </div>
       </div>
@@ -48,15 +52,17 @@ function Types() {
                   <img className="rounded-md h-40 object-cover" src={type.image ? import.meta.env.VITE_BASE_URL + "/" + type.image : image1} alt={type.name} />
                 </div>
                 <Link to={`edit-types/${type._id}`}>
-                  <Button>Edit</Button>
+                  <Button className="bg-yellow-500">
+                    <EditIcon color={"white"} />
+                  </Button>
                 </Link>
               </Card>
-            );
+            )
           })}
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default Types;
+export default Types

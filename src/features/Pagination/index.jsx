@@ -1,16 +1,21 @@
+import { useLocation, useSearchParams } from "react-router-dom"
 import Button from "../../components/Button"
 
-function Pagination({ display = 10, totalData, currentPage, setPage, className = "" }) {
+function Pagination({ display = 10, totalData, currentPage, className = "" }) {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const location = useLocation()
   const pageHandler = (i) => {
-    setPage(() => {
-      return i
-    })
+    const tmp = new URLSearchParams(location.search)
+    tmp.set("page", i)
+    setSearchParams(tmp)
   }
 
   let maxPageNumbers = 5
   function getPageNumbers() {
     const pageNumbers = []
-    let lastPage = Math.abs(Math.round(totalData / display)) == 0 ? 1 : Math.abs(Math.round(totalData / display))
+    console.log(totalData)
+    console.log(Math.round(totalData / display))
+    let lastPage = Math.abs(Math.round(totalData / display)) == 0 ? 1 : Math.abs(Math.ceil(totalData / display))
     console.log(lastPage)
     if (lastPage <= maxPageNumbers) {
       // If total pages is less than or equal to maxPageNumbers, show all page numbers
@@ -61,9 +66,10 @@ function Pagination({ display = 10, totalData, currentPage, setPage, className =
       <Button
         disabled={currentPage < 2}
         onClick={() => {
-          setPage((prev) => {
-            return prev - 1
-          })
+          const tmp = new URLSearchParams(location.search)
+          let value = tmp.get("page") ? +tmp?.get("page") - 1 : 1
+          tmp.set("page", value)
+          setSearchParams(tmp)
         }}
         className="bg-primary"
       >
@@ -77,11 +83,12 @@ function Pagination({ display = 10, totalData, currentPage, setPage, className =
         )
       })}
       <Button
-        disabled={currentPage > Math.abs(totalData / display)}
+        disabled={currentPage > Math.round(totalData / display)}
         onClick={() => {
-          setPage((prev) => {
-            return prev + 1
-          })
+          const tmp = new URLSearchParams(location.search)
+          let value = tmp.get("page") ? +tmp?.get("page") + 1 : 1
+          tmp.set("page", value)
+          setSearchParams(tmp)
         }}
         className="bg-primary"
       >

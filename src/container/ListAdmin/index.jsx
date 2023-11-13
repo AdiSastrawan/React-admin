@@ -4,12 +4,12 @@ import Table from "../../components/Table"
 import useAxiosPrivate from "../../hooks/axiosPrivate"
 import { AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Button, Spinner, useDisclosure } from "@chakra-ui/react"
 import Pagination from "../../features/Pagination"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useSearchParams } from "react-router-dom"
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
 
-const getListAdmin = async (axiosCLient, setData, setLoading, page, search, type) => {
+const getListAdmin = async (axiosCLient, setData, setLoading, page, search) => {
   try {
-    const response = await axiosCLient.get(`/superuser/list-admin?page=${page}${search ? "&search=" + search : ""}${type ? "&type=" + type : ""}`)
+    const response = await axiosCLient.get(`/superuser/list-admin?page=${page}${search ? "&search=" + search : ""}`)
     setData(response.data)
     console.log(response.data)
   } catch (error) {
@@ -33,16 +33,28 @@ function ListAdmin() {
   const { isOpen, onClose, onOpen } = useDisclosure()
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
   const cancelRef = useRef()
-  const [type, setType] = useState("")
-  const [page, setPage] = useState(1)
+  const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
   const axiosClient = useAxiosPrivate()
   const options = { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }
+  const searchHandler = (e) => {
+    let tmp = new URLSearchParams(location.search)
+    tmp.set(e.target.name, e.target.value)
+    tmp.set("page", 1)
+    setSearchParams(tmp, { replace: true })
+  }
   useEffect(() => {
-    getListAdmin(axiosClient, setData, setLoading, page, search, type)
+    getListAdmin(axiosClient, setData, setLoading, searchParams.get("page"), searchParams.get("keyword"))
   }, [loading])
+  useEffect(() => {
+    let timeOut = setTimeout(() => {
+      getListAdmin(axiosClient, setData, setLoading, searchParams.get("page"), searchParams.get("keyword"))
+    }, 500)
+    return () => {
+      clearTimeout(timeOut)
+    }
+  }, [setSearchParams])
   const onDelete = (e, id) => {
     setLoading(true)
     deleteAdmin(axiosClient, id, setLoading, onClose)
@@ -52,16 +64,7 @@ function ListAdmin() {
       <HeaderOutlet>List Admin</HeaderOutlet>
       <div className="w-full flex items-center justify-between py-2 px-2">
         <div className="space-x-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => {
-              setPage(1)
-              setSearch(e.target.value)
-            }}
-            placeholder="Search user"
-            className="focus:outline-accent border-2 rounded-md w-64  border-secondary px-2 py-1"
-          />
+          <input type="text" value={searchParams.get("keyword")} name={"keyword"} onChange={searchHandler} placeholder="Search user" className="focus:outline-accent border-2 rounded-md w-64  border-secondary px-2 py-1" />
         </div>
         <div>
           <Link to="add-admin" state={{ from: location }}>
@@ -123,7 +126,7 @@ function ListAdmin() {
         })}
       </Table>
       {/* {console.log(data.current)} */}
-      <Pagination setPage={setPage} currentPage={data?.current} totalData={data.totalData} display={data.displayPage} />
+      <Pagination currentPage={data?.current} totalData={data.totalData} display={data.displayPage} />
     </div>
   )
 }
