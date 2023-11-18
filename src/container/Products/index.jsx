@@ -85,11 +85,11 @@ function Product() {
       clearTimeout(sentSearch)
       controller.abort()
     }
-  }, [searchParams])
+  }, [searchParams, deleteData])
   useEffect(() => {
     fetchTypes(setTypes, axiosPrivate)
   }, [])
-  const deleteProduct = (id) => {
+  const deleteProduct = (id, e) => {
     setTrigger((prev) => {
       return !prev
     })
@@ -136,7 +136,8 @@ function Product() {
                   <Td>{r.name}</Td>
                   <Td>{r.type?.name}</Td>
                   <Td>
-                    <img className="h-20 w-20 object-contain " src={import.meta.env.VITE_BASE_URL + `/` + r.image} alt={r.name} />
+                    {console.log(r.image)}
+                    <img className="h-20 w-20 object-contain " src={import.meta.env.VITE_BASE_URL + `/${Array.isArray(r.image) ? r.image[0] : r.image}`} alt={r.name} />
                   </Td>
                   <Td>{r.price}</Td>
                   <Td>{sumArray(r.stock)}</Td>
@@ -173,14 +174,7 @@ function Product() {
                         <Button ref={cancelRef} onClick={onClose} mr={2}>
                           Cancel
                         </Button>
-                        <Button
-                          colorScheme="red"
-                          disabled={loading}
-                          onClick={() => {
-                            deleteProduct.bind(this, r._id)
-                          }}
-                          ml={3}
-                        >
+                        <Button colorScheme="red" disabled={loading} onClick={deleteProduct.bind(this, r._id)} ml={3}>
                           {loading ? <Spinner /> : "Delete"}
                         </Button>
                       </AlertDialogFooter>

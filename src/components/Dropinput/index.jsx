@@ -1,28 +1,35 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react"
+import { useRef } from "react"
 
-function Dropinput({ setPayload, setIsDrag, isDrag, payload }) {
-  const [previewImage, setPreviewImage] = useState(payload?.image ? `${import.meta.env.VITE_BASE_URL}/${payload?.image}` : "");
+function DropInput({ setPayload, setIsDrag, isDrag, payload }) {
+  const [previewImage, setPreviewImage] = useState(payload?.image ? import.meta.env.VITE_BASE_URL + "/" + payload.image : "")
   const dropHandler = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDrag(false);
+    if (!e.dataTransfer.files[0]) {
+      return 0
+    }
+    e.preventDefault()
+    e.stopPropagation()
+    setIsDrag(false)
+
     setPayload((prev) => {
-      let tmp = { ...prev };
-      tmp.image = e.dataTransfer.files[0];
-      return tmp;
-    });
-    setPreviewImage(URL.createObjectURL(e.dataTransfer.files[0]));
-  };
-  const imageRef = useRef();
+      let tmp = { ...prev }
+      tmp.image = e.dataTransfer.files[0]
+      return tmp
+    })
+
+    setPreviewImage(URL.createObjectURL(e.dataTransfer.files[0]))
+  }
+  console.log(previewImage)
+  const imageRef = useRef()
   return (
     <div
-      className={`bg-background relative flex group justify-center py-2 cursor-pointer transition-colors hover:bg-secondary rounded-md`}
+      className={`bg-background relative flex justify-center py-2 cursor-pointer z-[1] transition-colors hover:bg-secondary rounded-md`}
       onClick={() => {
-        imageRef.current.click();
+        imageRef.current.click()
       }}
       onDragOver={(e) => {
-        e.preventDefault();
-        setIsDrag(true);
+        e.preventDefault()
+        setIsDrag(true)
       }}
       onDrop={dropHandler}
     >
@@ -32,7 +39,7 @@ function Dropinput({ setPayload, setIsDrag, isDrag, payload }) {
           <h2 className="">Click or drop the image here</h2>
         </div>
       ) : (
-        <img className="h-60 group-hover:scale-105 group-hover:shadow-xl transition-all object-contain" src={previewImage} alt={payload?.name} />
+        <img className="h-60 hover:scale-105 hover:shadow-xl transition-all object-contain" src={previewImage} alt={payload?.name} />
       )}
       <input
         hidden
@@ -41,19 +48,26 @@ function Dropinput({ setPayload, setIsDrag, isDrag, payload }) {
         id="image"
         name="image"
         onChange={(e) => {
-          setPreviewImage(() => {
-            setPayload((prev) => {
-              let tmp = { ...prev };
-              tmp.image = e.target.files[0];
-              return tmp;
-            });
-            return URL.createObjectURL(e.target.files[0]);
-          });
+          console.log(e.target.files)
+          if (!e.target.files[0]) {
+            return 0
+          }
+          e.preventDefault()
+          e.stopPropagation()
+          setIsDrag(false)
+
+          setPayload((prev) => {
+            let tmp = { ...prev }
+            tmp.image = e.target.files[0]
+            return tmp
+          })
+
+          setPreviewImage(URL.createObjectURL(e.target.files[0]))
         }}
         accept={"image/jpeg,image/png,image/gif"}
       />
     </div>
-  );
+  )
 }
 
-export default Dropinput;
+export default DropInput
