@@ -1,7 +1,11 @@
+import Logo from "../../assets/siento.svg"
+import jwtDecode from "jwt-decode"
+import useAuth from "../../hooks/useAuth"
 import Navlist from "./Navlist"
 import NavLists from "./Navlists"
-import Logo from "../../assets/siento.svg"
+
 function Sidebar() {
+  const { auth } = useAuth()
   return (
     <div className="w-1/4 bg-primary h-screen overflow-y-auto  ">
       <nav className=" min-h-screen   font-roboto">
@@ -9,6 +13,9 @@ function Sidebar() {
         <NavLists className="text-xl font-medium">
           <Navlist to="/">Dashboard</Navlist>
           <Navlist to="products">Product</Navlist>
+          <Navlist to="types">Types</Navlist>
+          <Navlist to="sizes">Sizes</Navlist>
+          {jwtDecode(auth.accessToken)?.role == "superuser" && <Navlist to="list-admin">List Admin</Navlist>}
         </NavLists>
       </nav>
     </div>

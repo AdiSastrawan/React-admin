@@ -1,13 +1,14 @@
-import React, { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import HeaderOutlet from "../../../features/Header";
 import Input from "../../../components/Input";
 import Label from "../../../components/Label";
 import Button from "../../../components/Button";
 import StockElement from "../../../features/StockElement";
 import useAxiosPrivate from "../../../hooks/axiosPrivate";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Spinner from "../../../components/Spinner";
 import Select from "../../../components/Select";
+import Dropinput from "../../../components/Dropinput";
 
 const getType = async (setType, axiosClient) => {
   try {
@@ -18,7 +19,7 @@ const getType = async (setType, axiosClient) => {
   }
 };
 
-const getProduct = async (setPayload, id, axiosClient) => {
+const getProduct = async (setPayload, id, axiosClient, setIsFetch) => {
   try {
     const response = await axiosClient.get(`/products/${id}`);
     setPayload((prev) => {
@@ -28,10 +29,13 @@ const getProduct = async (setPayload, id, axiosClient) => {
       tmp.type = response.data.type._id;
       tmp.desc = response?.data.desc;
       tmp.stock = [...response.data.stock];
+      tmp.image = response?.data.image;
       return tmp;
     });
   } catch (error) {
     console.log(error);
+  } finally {
+    setIsFetch(false);
   }
 };
 const sendData = async (formData, setLoading, navigate, id, axiosClient) => {
@@ -46,13 +50,23 @@ const sendData = async (formData, setLoading, navigate, id, axiosClient) => {
     setLoading(false);
   }
 };
+const getSize = async (setSize, axiosClient) => {
+  try {
+    const response = await axiosClient.get("/size");
+    setSize(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+};
 function EditProduct() {
   const { id } = useParams();
   const axiosClient = useAxiosPrivate();
   const [type, setType] = useState([]);
   const [size, setSize] = useState([]);
+  const [isDrag, setIsDrag] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isFetch, setIsFetch] = useState(true);
   const [payload, setPayload] = useState({ name: "", image: {}, type: "", price: 0, stock: [{ size_id: null, quantity: 0 }], desc: "" });
   const location = useLocation();
   const from = location.state.from.pathname || "/";
@@ -63,14 +77,11 @@ function EditProduct() {
       return tmp;
     });
   };
-  const test = () => {
-    console.log(payload);
-    console.log(from);
-    console.log(location);
-  };
+
   useEffect(() => {
-    getProduct(setPayload, id, axiosClient);
+    getProduct(setPayload, id, axiosClient, setIsFetch);
     getType(setType, axiosClient);
+    getSize(setSize, axiosClient);
   }, []);
 
   const changeHandler = (e, key) => {
@@ -89,19 +100,33 @@ function EditProduct() {
     formData.append("image", payload.image);
     formData.append("stock", JSON.stringify(payload.stock));
     formData.append("price", payload.price);
-    console.log(formData.get("stock"));
 
     setLoading(true);
     sendData(formData, setLoading, navigate, id, axiosClient);
   };
 
   return (
-    <div className="mx-4 my-2 p-3 rounded-md bg-secondary">
-      <Button className="bg-gray-500 text-black px-3 ">
-        <Link to={from}>{"<"}</Link>
+    <div
+      className="mx-4 my-2 p-3 rounded-md bg-secondary"
+      onDragOver={(e) => {
+        e.preventDefault();
+        setIsDrag(true);
+      }}
+    >
+      <Button
+        onClick={() => {
+          navigate(from);
+        }}
+        className="bg-gray-500 text-black px-3 "
+      >
+        {"<"}
       </Button>
       <HeaderOutlet>Edit Product</HeaderOutlet>
-      <Suspense fallback={<Spinner />}>
+      {isFetch ? (
+        <div className="w-full min-h-screen flex justify-center items-center">
+          <Spinner />
+        </div>
+      ) : (
         <form onSubmit={submitHandler} className="grid grid-cols-2 gap-2" action="">
           <div className="flex flex-col space-y-2">
             <Label>Product Name</Label>
@@ -116,31 +141,29 @@ function EditProduct() {
               value={payload.name}
             />
             <Label>Type</Label>
-            <Suspense fallback={<h1>...</h1>}>
-              <Select
-                className="capitalize px-2"
-                onChange={(e) => {
-                  changeHandler(e, "type");
-                }}
-                name="type"
-                id=""
-              >
-                {type.map((t, i) => {
-                  if (t._id == payload.type) {
-                    return (
-                      <option key={i} className="capitalize" selected value={t._id}>
-                        {t.name}
-                      </option>
-                    );
-                  }
+            <Select
+              className="capitalize px-2"
+              onChange={(e) => {
+                changeHandler(e, "type");
+              }}
+              name="type"
+              id=""
+            >
+              {type.map((t, i) => {
+                if (t._id == payload.type) {
                   return (
-                    <option key={i} className="capitalize" value={t._id}>
+                    <option key={i} className="capitalize" selected value={t._id}>
                       {t.name}
                     </option>
                   );
-                })}
-              </Select>
-            </Suspense>
+                }
+                return (
+                  <option key={i} className="capitalize" value={t._id}>
+                    {t.name}
+                  </option>
+                );
+              })}
+            </Select>
             <Label>Description</Label>
             <textarea
               name="description"
@@ -153,15 +176,7 @@ function EditProduct() {
               value={payload?.desc}
             ></textarea>
             <Label>Image</Label>
-            <input
-              type="file"
-              id="image"
-              name="image"
-              onChange={(e) => {
-                changeHandler(e, "image");
-              }}
-              accept={"image/jpeg,image/png,image/gif"}
-            />
+            <Dropinput payload={payload} setIsDrag={setIsDrag} setPayload={setPayload} isDrag={isDrag} />
           </div>
           <div className="flex flex-col space-y-2">
             <Label>Price</Label>
@@ -181,7 +196,6 @@ function EditProduct() {
               </div>
               {payload.stock.map((row, i) => {
                 return <StockElement update={true} key={i} ind={i} size={size} deleteHandler={deleteHandler} payload={payload} setPayload={setPayload} />;
-                //   return row;
               })}
             </div>
             <Button disabled={loading} className="bg-accent" type="submit">
@@ -189,8 +203,7 @@ function EditProduct() {
             </Button>
           </div>
         </form>
-      </Suspense>
-      <Button onClick={test}>Test</Button>
+      )}
     </div>
   );
 }

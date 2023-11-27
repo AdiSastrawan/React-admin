@@ -26,7 +26,13 @@ function PersistLogin() {
     }
     return () => (isMounted = false);
   }, []);
-  return loading ? <Spinner className="h-20 w-20" /> : <Outlet />;
+  return loading ? (
+    <div className="w-full min-h-screen justify-center flex items-center">
+      <Spinner className="h-20 w-20" />
+    </div>
+  ) : (
+    <Outlet />
+  );
 }
 
 export default PersistLogin;
