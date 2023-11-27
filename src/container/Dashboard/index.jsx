@@ -70,19 +70,19 @@ function Dashboard() {
       <div className="grid grid-cols-4 gap-4">
         <div className="min-h-[3rem] flex items-center justify-center shadow-md rounded-md flex-col py-2">
           <h2 className="text-center font-medium text-lg py-2">Total Costumers</h2>
-          <h2 className="font-bold text-center">{data?.count_costumer?.amount}</h2>
+          <h2 className="font-bold text-center text-xl">{data?.count_costumer?.amount}</h2>
         </div>
         <div className="min-h-[3rem] flex items-center justify-center shadow-md rounded-md flex-col py-2">
           <h2 className="text-center font-medium text-lg py-2">Total Products</h2>
-          <h2 className="font-bold text-center">{data?.count_products?.amount}</h2>
+          <h2 className="font-bold text-center text-xl">{data?.count_products?.amount}</h2>
         </div>
         <div className="min-h-[3rem] py-2 flex items-center justify-center shadow-md flex-col rounded-md">
           <h2 className="text-center font-medium text-lg py-2">Total Transaction</h2>
-          <h2 className="font-bold text-center">{data?.count_transactions?.amount}</h2>
+          <h2 className="font-bold text-center text-xl">{data?.count_transactions?.amount}</h2>
         </div>
         <div className="min-h-[3rem] flex items-center justify-center shadow-md py-2 flex-col rounded-md">
           <h2 className="text-center font-medium text-lg py-2">Total Admin</h2>
-          <h2 className="font-bold text-center">{data?.count_admin?.amount}</h2>
+          <h2 className="font-bold text-center text-xl">{data?.count_admin?.amount}</h2>
         </div>
       </div>
       <div className="w-full grid grid-cols-4  pt-8 gap-2">

@@ -35,8 +35,8 @@ function SizeContent() {
   return (
     <>
       <div className="flex justify-end px-3 pb-3">
-        <Link to="add-size">
-          <Button className="bg-green-600 flex space-x-2">
+        <Link to="add-size" state={{ from: location }}>
+          <Button className="bg-green-600 flex items-center space-x-2">
             <AddIcon color="white" />
             <h2>Add Size</h2>
           </Button>
